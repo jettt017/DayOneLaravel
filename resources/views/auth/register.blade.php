@@ -7,7 +7,7 @@
                 Smart Notes Ai
             </h1>
 
-            <form method="POST" action="/login">
+            <form method="POST" action="/register">
                 @csrf
 
                 <div class="mb-4">
@@ -35,7 +35,7 @@
                 </div>
 
                 <x-button class="w-full">
-                    Login
+                    Daftar
                 </x-button>
             </form>
         </div>

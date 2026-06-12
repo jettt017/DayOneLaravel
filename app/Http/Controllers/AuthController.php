@@ -2,36 +2,53 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLogin ()
+    public function showLogin()
     {
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
-        if (
-            $request->username === "admin"
-            &&
-            $request->password === "12345678"
-        ) {
-            session([
-                'is_logged_in' => true,
-                'username' => 'admin'
-            ]);
+        $user = User::where('name', $request->name)->first();
 
-            return redirect('/');
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return back();
         }
-        return back();
+
+        session([
+            'is_logged_in' => true,
+            'user_id'      => $user->id,
+            'username'     => $user->name,
+        ]);
+
+        return redirect()->route('dashboard');
+    }
+
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        User::create([
+            'name'     => $request->name,
+            'password' => $request->password,
+        ]);
+
+        return redirect()->route('login');
     }
 
     public function logout()
     {
         session()->flush();
 
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }
