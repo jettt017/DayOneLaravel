@@ -77,6 +77,36 @@ class NoteController extends Controller
 
     }
 
+    public function summaryStream($id)
+    {
+        $user = User::findOrFail(session('user_id'));
+
+        $note = $user->notes()->findOrFail($id);
+
+        if (!empty($note['document'])) {
+            $path = storage_path('app/private/' . $note['document']);
+            $file = Files\Document::fromPath($path);
+
+            $stream = SummaryAgent::make()->stream(
+                'Buat ringkasan yang jelas, singkat dan mudah dipahami.',
+                attachments: [
+                    $file
+                ]
+            );
+        } else {
+            $stream = SummaryAgent::make()->stream(
+                $note->content
+            );
+        }
+
+        $stream->then(function (\Laravel\Ai\Responses\StreamedAgentResponse $response) use ($note) {
+            $note->summary = Str::markdown($response->text);
+            $note->save();
+        });
+
+        return $stream;
+    }
+
     public function upload (Request $request)
     {
         $path = $request->file('document')->store('documents');

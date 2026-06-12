@@ -25,6 +25,7 @@ Route::middleware(CheckLogin::class)->group(function () {
         Route::post('/upload', 'upload')->name('upload');
         Route::get('/{id}', 'show')->name('show');
         Route::get('/{id}/summary', 'summary')->name('summary');
+        Route::get('/{id}/summary/stream', 'summaryStream')->name('summary.stream');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
